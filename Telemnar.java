@@ -19,6 +19,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
+import javafx.scene.layout.VBox;
+import javafx.stage.Popup;
 
 /**
  *
@@ -94,6 +96,19 @@ public class Telemaer extends Application {
         statsBox.getChildren().add(message);
 
         basicView.setBottom(statsBox);
+        
+        Popup startPopup = new Popup();
+        VBox startPopupBox = new VBox();
+        startPopupBox.setStyle("-fx-background-color: lightgrey; -fx-padding: 10;");
+        Label startPopupLabel = new Label("Welcome to Telemaer!");
+        startPopupBox.getChildren().add(startPopupLabel);
+        Button startPopupButton = new Button("Let's go!");
+        startPopupButton.addEventHandler(MouseEvent.MOUSE_CLICKED, (MouseEvent e) -> {
+            startPopup.hide();
+        });
+        startPopupBox.getChildren().add(startPopupButton);
+        startPopup.getContent().add(startPopupBox);        
+
         
         //keyboard commands
         
@@ -182,6 +197,7 @@ public class Telemaer extends Application {
 
         stage.setScene(scene);
         stage.show();
+        startPopup.show(stage);
     }
 
     public static void main(String[] args) {
