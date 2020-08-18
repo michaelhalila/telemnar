@@ -5,6 +5,10 @@
  */
 package telemnar;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Random;
+import java.util.Scanner;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.stage.Stage;
@@ -36,6 +40,8 @@ public class Telemaer extends Application {
     public final static int TILESIZE = 32;
     public final static int MAPWIDTH = 50;
     public final static int MAPHEIGHT = 20;
+    
+    public final static int MAXNAMELENGTH = 24;
 
     @Override
     public void start(Stage stage) {
@@ -97,10 +103,12 @@ public class Telemaer extends Application {
 
         basicView.setBottom(statsBox);
         
+        String playerName = generateHalflingName();
+        
         Popup startPopup = new Popup();
         VBox startPopupBox = new VBox();
         startPopupBox.setStyle("-fx-background-color: lightgrey; -fx-padding: 10;");
-        Label startPopupLabel = new Label("Welcome to Telemaer!");
+        Label startPopupLabel = new Label("Welcome to Telemaer! \nYou are " + playerName + ", a Hobbit wastrel.");
         startPopupBox.getChildren().add(startPopupLabel);
         Button startPopupButton = new Button("Let's go!");
         startPopupButton.addEventHandler(MouseEvent.MOUSE_CLICKED, (MouseEvent e) -> {
@@ -224,5 +232,197 @@ public class Telemaer extends Application {
         }
         return map;
     }
+    
+        //name generator methods start here
+    
+    public static ArrayList<String> generateNameList(String filename) {
+        
+        //reads a .txt file consisting of line-separated names into an arraylist
+        
+        ArrayList<String> names = new ArrayList<>();
+        
+        try (Scanner fileReader = new Scanner(new File(filename))) {
+            while (fileReader.hasNextLine()) {
+                names.add(fileReader.nextLine());
+            }
+        } catch (Exception e) {
+            System.out.println("File could not be read. " + e.getMessage());
+        }
+        
+        return names;
+    }
+    
+    public static String generateName(ArrayList<String> names) {
+    
+        //returns a random name from the arraylist
+        
+        if (names.size() > 0) {
+            Random random = new Random();
+            int index = random.nextInt(names.size());
+            return names.get(index);
+        } else {
+            return "Name could not be generated.";
+        }
+    }
+    
+    public static boolean checkNameLength(String name, int length) {
+        
+        //check if the name length is equal or under to allowed length
+        
+        return name.length() <= length;
+    }
+    
+    public static ArrayList<String> getNamesShorterThan (ArrayList<String> names, int length) {
+        ArrayList<String> shorterNames = new ArrayList<>();
+        for (String name : names) {
+            if (name.length() < length) {
+                shorterNames.add(name);
+            }
+        }
+        return shorterNames;
+    }
+    
+     //Hobbit methods
+    
+    public static String generateHalflingName() {
+
+        ArrayList<String> hobbitLastNames = generateNameList("hobbitln.txt");
+        String wholeName;
+        String firstName;
+        String lastName;
+        String nameWithNickName;
+        boolean isNickName = false;
+        boolean isAddLastName = false;
+        
+        while (true) {
+
+            //while loop generates name and checks its length
+            
+            ArrayList<String> hobbitFirstNames = generateNameList("hobbitfn.txt");
+            firstName = generateName(hobbitFirstNames);        
+            
+                //while loop to stop certain names from being generated
+        
+            while (true) {
+                lastName = generateName(hobbitLastNames);
+                
+                if (firstName.equals("Guybrush") && lastName.equals("Threepwood")) {
+                    lastName = generateName(hobbitLastNames);
+                } else {
+                    break;
+                }
+            }
+        
+            wholeName = firstName + " " + lastName;
+            System.out.println(wholeName);
+            
+            if (checkNameLength(wholeName,Telemaer.MAXNAMELENGTH)) {
+                break;
+            } else {
+                System.out.println("Name too long!");
+            }
+        }
+        
+        if (checkNameLength(wholeName,Telemaer.MAXNAMELENGTH)) {
+        
+            //generate nickname, checking it is not the same as the first name
+
+            System.out.println("Trying nickname!");
+            String nickname = generateHobbitNickname(firstName);
+            nameWithNickName = firstName + " \"" + nickname + "\" " + lastName;
+            System.out.println(nameWithNickName);
+                
+            
+            //check combined name length, if not over maximum add nickname
+            
+            if (checkNameLength(nameWithNickName,Telemaer.MAXNAMELENGTH)) {
+                wholeName = nameWithNickName;
+                isNickName = true;
+                System.out.println("Nickname generated!");                
+                } else {
+                System.out.println("Name too long!");
+                }
+                        
+            }
+        
+        while (wholeName.length() <= Telemaer.MAXNAMELENGTH) {
+            
+            //try adding additional last names
+            System.out.println("Trying additional surname!");
+            String addLastName = generateName(hobbitLastNames);
+            System.out.println(wholeName + "-" + addLastName);
+            if (wholeName.length() + addLastName.length() + 1 <= Telemaer.MAXNAMELENGTH) {
+                if (addLastName.equals("of the Marish")) {
+                    wholeName = wholeName + " " + addLastName;
+                    isAddLastName = true;
+                    System.out.println("Surname incremented!");
+                    break;
+                } else if (lastName.equals("of the Marish")) {
+                    wholeName = firstName + " " + addLastName + " " + lastName;
+                    isAddLastName = true;
+                    System.out.println("Surname incremented!");
+                    break;
+                } else {
+                    wholeName = wholeName + "-" + addLastName;
+                    }
+                    isAddLastName = true;
+                    System.out.println("Surname incremented!");
+                    
+            } else {
+                System.out.println("Name too long!");
+                break;
+            }
+
+        }
+        
+        // try to add a shorter nickname to names without additional surnames or nicknames
+        
+        if (isNickName == false && isAddLastName == false) {
+            
+            //LeCheck
+            
+            if (lastName.equals("LeChuck")) {
+                if (wholeName.length() < (Telemaer.MAXNAMELENGTH - 6)) {
+                    wholeName = firstName + " \"G.P.\" " + lastName;
+                    System.out.println("LeCheck!");
+                    }
+                } else {
+                    System.out.println("Trying shorter nickname!");
+                    int availableCharacters = Telemaer.MAXNAMELENGTH - wholeName.length();
+                    if (availableCharacters > 6) {
+                        ArrayList<String> hobbitNickNames = generateNameList("hobbitnn.txt");
+                        ArrayList<String> availableNickNames = getNamesShorterThan(hobbitNickNames, availableCharacters - 2);
+                        if (!availableNickNames.isEmpty()) {
+                            String newNick = generateName(availableNickNames);
+                            if (!newNick.isEmpty()) {
+                                wholeName = firstName + " \"" + newNick + "\" " + lastName;
+                                System.out.println(wholeName);
+                            } else {
+                                System.out.println("No nicknames found! - although this should never happen");
+                            }
+                        } else {
+                            System.out.println("No nicknames found!");
+                        }
+                    } else {
+                        System.out.println("No space!");
+                    }
+                }
+            }
+        
+        return wholeName;
+        
+    }
+    
+    public static String generateHobbitNickname(String noName) {
+        ArrayList<String> hobbitNickNames = generateNameList("hobbitnn.txt");
+        String name;
+        while (true) {
+            name = generateName(hobbitNickNames);
+            if (!name.equals(noName)) {
+            return name;
+            }
+        }
+    }
+    
 
 }
