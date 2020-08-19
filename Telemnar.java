@@ -42,6 +42,8 @@ public class Telemaer extends Application {
     public final static int MAPHEIGHT = 20;
     
     public final static int MAXNAMELENGTH = 24;
+    
+    public boolean acceptingInput = false;
 
     @Override
     public void start(Stage stage) {
@@ -98,7 +100,7 @@ public class Telemaer extends Application {
         statsBox.getChildren().add(turnCounter);
         Label playerStats = new Label("Power level: 0");
         statsBox.getChildren().add(playerStats);
-        Label message = new Label ("Welcome to Telemaer");
+        Label message = new Label ("Welcome to Telemnar");
         statsBox.getChildren().add(message);
 
         basicView.setBottom(statsBox);
@@ -108,10 +110,11 @@ public class Telemaer extends Application {
         Popup startPopup = new Popup();
         VBox startPopupBox = new VBox();
         startPopupBox.setStyle("-fx-background-color: lightgrey; -fx-padding: 10;");
-        Label startPopupLabel = new Label("Welcome to Telemaer! \nYou are " + playerName + ", a Hobbit wastrel.");
+        Label startPopupLabel = new Label("Welcome to Telemnar! \nYou are " + playerName + ", a Hobbit wastrel.");
         startPopupBox.getChildren().add(startPopupLabel);
         Button startPopupButton = new Button("Let's go!");
         startPopupButton.addEventHandler(MouseEvent.MOUSE_CLICKED, (MouseEvent e) -> {
+            acceptingInput = true;
             startPopup.hide();
         });
         startPopupBox.getChildren().add(startPopupButton);
@@ -121,7 +124,7 @@ public class Telemaer extends Application {
         //keyboard commands
         
         scene.setOnKeyReleased(event -> {
-            if (event.getCode() == KeyCode.RIGHT) {
+            if (event.getCode() == KeyCode.RIGHT && acceptingInput) {
                 if (player.getX() < MAPWIDTH - 1) {
                     if (map[player.getX()+1][player.getY()].isPassable()) {
                         if (player.moveRight()) {
@@ -134,7 +137,7 @@ public class Telemaer extends Application {
                 message.setText("You cannot go that way.");
 
             }
-            if (event.getCode() == KeyCode.LEFT) {
+            if (event.getCode() == KeyCode.LEFT && acceptingInput) {
                if (player.getX() > 0) {
                     if (map[player.getX()-1][player.getY()].isPassable()) {
                         if (player.moveLeft()) {
@@ -148,7 +151,7 @@ public class Telemaer extends Application {
 
             }
             
-            if (event.getCode() == KeyCode.UP) {
+            if (event.getCode() == KeyCode.UP && acceptingInput) {
                if (player.getY() > 0) {
                     if (map[player.getX()][player.getY()-1].isPassable()) {
                         if (player.moveUp()) {
@@ -161,7 +164,7 @@ public class Telemaer extends Application {
                 message.setText("You cannot go that way.");
 
             }
-            if (event.getCode() == KeyCode.DOWN) {
+            if (event.getCode() == KeyCode.DOWN && acceptingInput) {
                if (player.getY() < MAPHEIGHT - 1) {
                     if (map[player.getX()][player.getY()+1].isPassable()) {
                         if (player.moveDown()) {
