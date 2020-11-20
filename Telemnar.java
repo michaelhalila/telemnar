@@ -84,11 +84,21 @@ public class Telemaer extends Application {
         Image basicFloor = new Image("/floor01.png");
         Image rock = new Image("/rock.png");
         Image wallSouth = new Image("/wall_s.png");
+        
+        //naming the player
 
         Unit player = new Unit(5, 5, true);
         String playerName = generateHalflingName();
+        String playerCalled = getFirstName(playerName);
+        if (playerName.contains("\"")) {
+            playerCalled = getNickname(playerName);
+        }
+        System.out.println("The player will be called " + playerCalled);
+        
         String playerClass = "Wastrel";
         String playerAuntName = generateHobbitAuntName();
+        
+        //canvas
 
         basicView.setCenter(canvas);
         Scene scene = new Scene(basicView);
@@ -448,6 +458,7 @@ public class Telemaer extends Application {
                     wholeName = wholeName + "-" + addLastName;
                 }
                 System.out.println("Surname incremented!");
+                break;
 
             } else {
                 System.out.println("Name too long!");
@@ -456,6 +467,19 @@ public class Telemaer extends Application {
         }
 
         return wholeName;
+    }
+    
+    public static String getNickname(String name) {
+        int start = name.indexOf("\"");
+        int end = name.lastIndexOf("\"");
+        String nickname = name.substring(start+1,end);
+        return nickname;
+    }
+    
+    public static String getFirstName(String name) {
+        int end = name.indexOf(" ");
+        String firstName = name.substring(0,end);
+        return firstName;
     }
 
 }
