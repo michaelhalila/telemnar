@@ -41,6 +41,9 @@ public class Telemaer extends Application {
     public final static int MAPHEIGHT = 20;
 
     public final static int MAXNAMELENGTH = 30;
+    
+    public final static String INTROTEXT01 = "You must avoid this birthday-party at all costs.\nTherefore, you have come to the ancestral vaults of the";
+    public final static String INTROTEXT02 = " family,\nwhere you will hide out for its duration.\n";
 
     public boolean acceptingInput = false;
 
@@ -94,9 +97,16 @@ public class Telemaer extends Application {
             playerCalled = getNickname(playerName);
         }
         System.out.println("The player will be called " + playerCalled);
+        String playerLastName = getLastName(playerName);
+        System.out.println("Last name" + playerLastName);
         
         String playerClass = "Wastrel";
         String playerAuntName = generateHobbitAuntName();
+        String playerAuntFirstName = getFirstName(playerAuntName);
+        System.out.println("Aunt " + playerAuntFirstName);
+        
+        String playerUncleFirstName = generateHobbitFirstName(playerCalled);
+        System.out.println("Uncle " + playerUncleFirstName + playerLastName);
         
         //canvas
 
@@ -122,7 +132,7 @@ public class Telemaer extends Application {
         Popup startPopup = new Popup();
         VBox startPopupBox = new VBox();
         startPopupBox.setStyle("-fx-background-color: lightgrey; -fx-padding: 10;");
-        Label startPopupLabel = new Label("Welcome to Telemnar! \nYou are " + playerName + ", a Hobbit " + playerClass + ".\nTomorrow is your aunt " + playerAuntName + "'s birthday.");
+        Label startPopupLabel = new Label("Welcome to Telemnar! \nYou are " + playerName + ", a Hobbit " + playerClass + ".\nTomorrow is your aunt " + playerAuntName + "'s birthday.\n\n" + INTROTEXT01 + playerLastName + INTROTEXT02);
         startPopupBox.getChildren().add(startPopupLabel);
         Button startPopupButton = new Button("Let's go!");
         startPopupButton.addEventHandler(MouseEvent.MOUSE_CLICKED, (MouseEvent e) -> {
@@ -443,6 +453,17 @@ public class Telemaer extends Application {
         }
         return finalName;
     }
+    
+    public static String generateHobbitFirstName(String noName) {
+        ArrayList<String> hobbitFirstNames = generateNameList("hobbitfn.txt");
+        String name;
+        while (true) {
+            name = generateName(hobbitFirstNames);
+            if (!name.equals(noName)) {
+                return name;
+            }
+        }
+    }
 
     public static String augmentHobbitLastName(String name, ArrayList<String> lastNames) {
         String wholeName = name;
@@ -480,6 +501,12 @@ public class Telemaer extends Application {
         int end = name.indexOf(" ");
         String firstName = name.substring(0,end);
         return firstName;
+    }
+    
+    public static String getLastName(String name) {
+        int start = name.lastIndexOf(" ");
+        String lastName = name.substring(start,name.length());
+        return lastName;
     }
 
 }
